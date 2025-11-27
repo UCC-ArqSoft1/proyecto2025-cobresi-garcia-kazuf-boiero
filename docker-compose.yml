@@ -1,34 +1,70 @@
 version: "3.9"
 
 services:
+  # MySQL database for the app. Charset/collation set for full unicode support.
   mysql:
     image: mysql:8
+    container_name: gad-mysql
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: deportesdb
-      MYSQL_USER: appuser
-      MYSQL_PASSWORD: apppass
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-deportesdb}
+      MYSQL_USER: ${MYSQL_USER:-appuser}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-apppass}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
+  # Go backend (Gin + GORM). Builds from local Dockerfile.
   backend:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gad-backend
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+    env_file:
+      - .env
     environment:
-      SERVER_PORT: "8080"
-      DB_HOST: mysql
-      DB_PORT: "3306"
-      DB_USER: appuser
-      DB_PASSWORD: apppass
-      DB_NAME: deportesdb
-      JWT_SECRET: changeme
+      SERVER_PORT: ${SERVER_PORT:-8080}
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USER: ${DB_USER:-appuser}
+      DB_PASSWORD: ${DB_PASSWORD:-apppass}
+      DB_NAME: ${DB_NAME:-deportesdb}
+      JWT_SECRET: ${JWT_SECRET:-changeme}
     ports:
       - "8080:8080"
-    command: ["./backend"]
+    restart: unless-stopped
+    # Uncomment for live-reload during development (requires Air or similar inside the image).
+    # volumes:
+    #   - ./:/app
+
+  # Future React SPA (build + Nginx). Uncomment and adjust once frontend exists.
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile.frontend
+  #   depends_on:
+  #     - backend
+  #   environment:
+  #     - API_BASE_URL=http://backend:8080
+  #   ports:
+  #     - "5173:5173" # dev
+  #     # - "80:80"   # prod after building static assets
 
 volumes:
   mysql_data:

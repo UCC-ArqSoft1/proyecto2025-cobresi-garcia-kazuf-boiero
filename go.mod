@@ -1,6 +1,8 @@
 module github.com/alesio/gestion-actividades-deportivas
 
-go 1.24.2
+go 1.23.0
+
+toolchain go1.24.1
 
 require (
 	github.com/gin-gonic/gin v1.11.0
