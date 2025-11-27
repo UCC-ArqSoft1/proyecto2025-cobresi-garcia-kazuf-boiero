@@ -1,23 +1,33 @@
-# API Contract
+# API contract
 
 > Todos los endpoints devuelven `application/json`.
 
-## /api/health (GET)
-- **Descripción:** Verifica que la API esté viva.
-- **Request Body:** _N/A_
-- **Response 200:**
-```json
-{ "status": "ok" }
-```
-- **Errores comunes:** 500 cuando el servidor no puede responder.
+## Formatos base
+- `APIResponse`: `{ "success": true, "message": "opcional", "data": {} }`
+- `APIError`: `{ "success": false, "error": "descripcion legible", "code": "opcional" }`
 
-## /api/auth/login (POST)
-- **Descripción:** Inicia sesión de socios o administradores.
-- **Request Body:**
+## Modelos (contrato parcial)
+### User (JSON)
+Campos expuestos: `id`, `name`, `email`, `role`, `created_at`, `updated_at`. No se expone `password_hash`.
+
+### Activity (JSON)
+Campos expuestos: `id`, `title`, `description`, `category`, `day_of_week` (0=domingo .. 6=sabado), `start_time` (`HH:MM`), `end_time` (`HH:MM`), `capacity`, `instructor`, `image_url`, `is_active`, `created_at`, `updated_at`.
+
+### Enrollment (JSON)
+Campos expuestos: `id`, `user_id`, `activity_id`, `status`, `created_at`, `updated_at`, y opcionalmente los objetos embebidos `user` o `activity` segun uso de `Preload`.
+
+## Endpoints actuales
+### /api/health (GET)
+- Descripcion: verifica que la API esta viva.
+- Response 200: `{ "status": "ok" }`.
+
+### /api/auth/login (POST)
+- Descripcion: inicio de sesion de socios o administradores.
+- Body:
 ```json
 { "email": "ale@example.com", "password": "string" }
 ```
-- **Response 200:**
+- Response 200:
 ```json
 {
   "token": "jwt-token",
@@ -29,12 +39,10 @@
   }
 }
 ```
-- **Errores comunes:** 400 (payload inválido), 401 (credenciales inválidas).
 
-## /api/activities (GET)
-- **Descripción:** Lista actividades públicas con filtros opcionales `q`, `category`, `day`.
-- **Request Body:** _N/A_
-- **Response 200:**
+### /api/activities (GET)
+- Descripcion: lista actividades publicas con filtros opcionales `q`, `category`, `day`.
+- Response 200:
 ```json
 [
   {
@@ -42,27 +50,23 @@
     "title": "Funcional",
     "category": "fuerza",
     "day_of_week": 2,
-    "start_time": "18:00:00",
-    "end_time": "19:00:00",
+    "start_time": "18:00",
+    "end_time": "19:00",
     "capacity": 20,
-    "instructor": "Lucía",
+    "instructor": "Luca",
     "is_active": true
   }
 ]
 ```
-- **Errores comunes:** 500 (error interno al consultar DB).
 
-## /api/activities/:id (GET)
-- **Descripción:** Detalle de una actividad específica.
-- **Request Body:** _N/A_
-- **Response 200:** Actividad completa.
-- **Errores comunes:** 400 (id inválido), 404 (actividad no existe).
+### /api/activities/:id (GET)
+- Descripcion: detalle de una actividad especifica.
+- Response 200: actividad completa.
 
-## /api/activities/:id/enroll (POST)
-- **Descripción:** Inscribe al socio autenticado a una actividad.
-- **Auth:** Requiere token Bearer.
-- **Request Body:** _N/A_ (el ID se toma de la URL).
-- **Response 201:**
+### /api/activities/:id/enroll (POST)
+- Descripcion: inscribe al socio autenticado a una actividad.
+- Auth: requiere token Bearer.
+- Response 201:
 ```json
 {
   "id": 10,
@@ -71,12 +75,11 @@
   "status": "inscripto"
 }
 ```
-- **Errores comunes:** 400 (actividad inválida o sin cupo), 401 (sin token), 409 (duplicado, TODO), 500 (otros errores).
 
-## /api/me/activities (GET)
-- **Descripción:** Lista las actividades a las que está inscripto el socio autenticado.
-- **Auth:** Requiere token Bearer.
-- **Response 200:**
+### /api/me/activities (GET)
+- Descripcion: lista actividades del socio autenticado.
+- Auth: requiere token Bearer.
+- Response 200:
 ```json
 [
   {
@@ -88,36 +91,29 @@
   }
 ]
 ```
-- **Errores comunes:** 401 (sin token), 500 (error interno).
 
-## /api/admin/activities (POST)
-- **Descripción:** Crea actividades. Solo admin.
-- **Auth:** Token Bearer + rol admin.
-- **Request Body:**
+### /api/admin/activities (POST)
+- Descripcion: crea actividades. Solo admin.
+- Body:
 ```json
 {
   "title": "Pilates",
   "description": "",
   "category": "movilidad",
   "day_of_week": 4,
-  "start_time": "09:00:00",
-  "end_time": "10:00:00",
+  "start_time": "09:00",
+  "end_time": "10:00",
   "capacity": 12,
   "instructor": "Lola",
   "is_active": true
 }
 ```
-- **Response 201:** Actividad creada.
-- **Errores comunes:** 400 (datos inválidos), 401/403 (sin permisos), 500 (error DB).
+- Response 201: actividad creada.
 
-## /api/admin/activities/:id (PUT)
-- **Descripción:** Actualiza una actividad existente. Solo admin.
-- **Auth:** Token Bearer + rol admin.
-- **Response 200:** Actividad actualizada.
-- **Errores comunes:** 400 (payload o id inválido), 401/403 (sin permisos), 404 (no existe), 500 (error DB).
+### /api/admin/activities/:id (PUT)
+- Descripcion: actualiza una actividad existente. Solo admin.
+- Response 200: actividad actualizada.
 
-## /api/admin/activities/:id (DELETE)
-- **Descripción:** Desactiva o elimina una actividad. Solo admin.
-- **Auth:** Token Bearer + rol admin.
-- **Response 204:** _sin cuerpo_.
-- **Errores comunes:** 400 (id inválido), 401/403 (sin permisos), 404 (no existe), 500 (error DB).
+### /api/admin/activities/:id (DELETE)
+- Descripcion: desactiva o elimina una actividad. Solo admin.
+- Response 204: sin cuerpo.
