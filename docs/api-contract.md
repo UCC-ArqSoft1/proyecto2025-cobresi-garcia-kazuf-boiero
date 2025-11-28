@@ -105,32 +105,52 @@ Campos expuestos: `id`, `user_id`, `activity_id`, `status`, `created_at`, `updat
 - Response 200: actividad completa.
 
 ### /api/activities/:id/enroll (POST)
-- Descripcion: inscribe al socio autenticado a una actividad.
-- Auth: requiere token Bearer.
+- Descripcion: inscribe al socio o admin autenticado en una actividad activa.
+- Auth: requiere header `Authorization: Bearer <token>`.
+- Path params: `id` (uint) identificador de la actividad.
+- Body: sin cuerpo.
 - Response 201:
 ```json
 {
-  "id": 10,
-  "user_id": 5,
-  "activity_id": 3,
-  "status": "inscripto"
-}
-```
-
-### /api/me/activities (GET)
-- Descripcion: lista actividades del socio autenticado.
-- Auth: requiere token Bearer.
-- Response 200:
-```json
-[
-  {
-    "id": 12,
+  "success": true,
+  "message": "Inscripcion exitosa",
+  "data": {
+    "id": 10,
     "user_id": 5,
     "activity_id": 3,
     "status": "inscripto",
-    "activity": { "title": "Yoga" }
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
   }
-]
+}
+```
+- Errores:
+  - 404 `APIError` con `code: "ACTIVITY_NOT_FOUND"` si la actividad no existe.
+  - 400 `APIError` con `code: "ACTIVITY_INACTIVE"` si la actividad esta inactiva.
+  - 409 `APIError` con `code: "ALREADY_ENROLLED"` si el usuario ya esta inscripto.
+  - 409 `APIError` con `code: "NO_CAPACITY"` si no hay cupos.
+  - 401 `APIError` `code: "UNAUTHORIZED"` si falta o es invalido el token.
+
+### /api/me/activities (GET)
+- Descripcion: lista actividades en las que el usuario autenticado esta inscripto (status `inscripto`).
+- Auth: requiere header `Authorization: Bearer <token>`.
+- Response 200:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 5,
+      "title": "Zumba",
+      "description": "Clases de ritmos latinos",
+      "category": "zumba",
+      "day_of_week": 1,
+      "start_time": "19:30",
+      "end_time": "20:30",
+      "instructor": "Maria"
+    }
+  ]
+}
 ```
 
 ### /api/admin/activities (POST)

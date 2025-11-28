@@ -43,3 +43,8 @@
 | UpdatedAt | `time.Time` | `datetime` | Modificacion |
 
 **Relaciones:** `Enrollment` pertenece a `User` y `Activity` (OnDelete RESTRICT). Conceptualmente no debe haber dos inscripciones activas para la misma combinacion user/activity.
+
+Reglas de negocio para inscripciones:
+- No se permite mas de una inscripcion con `status = 'inscripto'` para la misma combinacion `user_id` y `activity_id`.
+- No se inscribe a actividades inactivas.
+- El cupo se valida contando inscripciones con `status = 'inscripto'` y comparando con `activity.capacity`.
