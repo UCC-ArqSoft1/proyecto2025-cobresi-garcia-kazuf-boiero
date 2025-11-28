@@ -68,6 +68,9 @@ const request = async (path, options = {}) => {
     error.status = response.status
     error.details = payload?.details ?? payload
     error.code = payload?.code
+    if (response.status === 401 && !error.code) {
+      error.code = 'UNAUTHORIZED'
+    }
     throw error
   }
 

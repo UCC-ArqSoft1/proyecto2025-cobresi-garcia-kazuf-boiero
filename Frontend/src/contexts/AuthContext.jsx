@@ -22,13 +22,17 @@ export const AuthProvider = ({ children }) => {
       return { user: null, token: null }
     }
   })
+  const [authReady, setAuthReady] = useState(false)
 
   useEffect(() => {
     setAuthToken(authState.token)
+    setAuthReady(true)
   }, [authState.token])
 
   const persistAuthState = (state) => {
     setAuthState(state)
+    // Keep apiClient token in sync immediately (avoid race on first request after login/logout)
+    setAuthToken(state.token)
     if (state.user && state.token) {
       localStorage.setItem(storageKey, JSON.stringify(state))
     } else {
@@ -60,11 +64,12 @@ export const AuthProvider = ({ children }) => {
       token: authState.token,
       isAuthenticated: Boolean(authState.user && authState.token),
       isAdmin: authState.user?.role === 'admin',
+      authReady,
       login,
       register,
       logout,
     }),
-    [authState.user, authState.token],
+    [authState.user, authState.token, authReady],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

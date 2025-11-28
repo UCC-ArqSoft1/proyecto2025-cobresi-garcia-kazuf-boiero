@@ -62,7 +62,7 @@ const LoginPage = () => {
             <h1 className="login-title">Log In</h1>
             <p className="login-helper">
               Para pruebas podés usar <strong>admin@example.com</strong> o <strong>socia@example.com</strong> con la
-              contraseña <em>changeme</em>.
+              contraseña <em>contra123</em>.
             </p>
 
             <form className="login-form" onSubmit={handleSubmit}>

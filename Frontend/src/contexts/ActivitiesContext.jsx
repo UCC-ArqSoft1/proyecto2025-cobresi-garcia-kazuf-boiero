@@ -14,7 +14,7 @@ import {
 const ActivitiesContext = createContext(null)
 
 export const ActivitiesProvider = ({ children }) => {
-  const { token } = useAuth()
+  const { token, user, isAuthenticated, authReady } = useAuth()
   const [activities, setActivities] = useState([])
   const [activitiesLoading, setActivitiesLoading] = useState(true)
   const [activitiesError, setActivitiesError] = useState(null)
@@ -57,12 +57,16 @@ export const ActivitiesProvider = ({ children }) => {
   }, [fetchActivities])
 
   useEffect(() => {
-    if (token) {
-      refreshMyActivities().catch(() => {})
-    } else {
+    // Esperar a que AuthContext haya finalizado la inicialización
+    if (!authReady) return
+
+    if (!isAuthenticated || !token || !user) {
       setMyActivities([])
+      return
     }
-  }, [token, refreshMyActivities])
+
+    refreshMyActivities().catch(() => {})
+  }, [authReady, isAuthenticated, token, user, refreshMyActivities])
 
   const createActivity = useCallback(async (payload) => {
     const created = await createActivityRequest(payload)
