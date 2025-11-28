@@ -20,7 +20,7 @@ _Antes de ejecutar exporta las variables de entorno o crea un `.env` basado en `
 ```bash
 docker compose up -d --build
 ```
-Esto levanta `mysql` y `backend` conectados con las variables definidas en `docker-compose.yml`.
+Esto levanta `mysql`, `backend` y `frontend` conectados con las variables definidas en `docker-compose.yml`. El frontend queda disponible en `http://localhost:5173` y consume la API publicada por el backend (`http://localhost:8080/api`). Para detenerlos ejecuta `docker compose down` desde la misma carpeta.
 
 ## Variables de entorno
 Revisa `.env.example` para conocer los valores mínimos:

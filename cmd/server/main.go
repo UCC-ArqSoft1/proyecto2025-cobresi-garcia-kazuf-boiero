@@ -20,6 +20,7 @@ func main() {
 	}
 
 	router := gin.Default()
+	router.Use(middlewares.CORSMiddleware())
 
 	// Initialize services.
 	authService := services.NewAuthService(db, cfg)

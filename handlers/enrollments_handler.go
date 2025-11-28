@@ -30,6 +30,7 @@ func NewEnrollmentsHandler(enrollmentService services.EnrollmentService) *Enroll
 
 func (h *EnrollmentsHandler) RegisterRoutes(router *gin.RouterGroup) {
 	router.POST("/activities/:id/enroll", h.EnrollInActivity)
+	router.DELETE("/activities/:id/enroll", h.UnenrollFromActivity)
 	router.GET("/me/activities", h.ListMyActivities)
 }
 
@@ -76,6 +77,12 @@ func (h *EnrollmentsHandler) EnrollInActivity(c *gin.Context) {
 				Success: false,
 				Error:   "La actividad no tiene cupos disponibles",
 				Code:    "NO_CAPACITY",
+			})
+		case services.ErrScheduleConflict:
+			c.JSON(http.StatusConflict, APIError{
+				Success: false,
+				Error:   "La actividad se solapa en dia y horario con otra inscripcion activa",
+				Code:    "SCHEDULE_CONFLICT",
 			})
 		default:
 			c.JSON(http.StatusInternalServerError, APIError{
@@ -130,6 +137,48 @@ func (h *EnrollmentsHandler) ListMyActivities(c *gin.Context) {
 	c.JSON(http.StatusOK, APIResponse{
 		Success: true,
 		Data:    activities,
+	})
+}
+
+func (h *EnrollmentsHandler) UnenrollFromActivity(c *gin.Context) {
+	userID, ok := getUserIDFromContext(c)
+	if !ok {
+		return
+	}
+
+	activityIDParam := c.Param("id")
+	activityID, err := strconv.ParseUint(activityIDParam, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, APIError{
+			Success: false,
+			Error:   "ID de actividad invalido",
+			Code:    "VALIDATION_ERROR",
+		})
+		return
+	}
+
+	if err := h.enrollmentService.UnenrollUserFromActivity(userID, uint(activityID)); err != nil {
+		switch err {
+		case services.ErrEnrollmentNotFound:
+			c.JSON(http.StatusNotFound, APIError{
+				Success: false,
+				Error:   "No estabas inscripto en esta actividad",
+				Code:    "ENROLLMENT_NOT_FOUND",
+			})
+		default:
+			c.JSON(http.StatusInternalServerError, APIError{
+				Success: false,
+				Error:   "No pudimos procesar la baja",
+				Code:    "INTERNAL_ERROR",
+				Details: err.Error(),
+			})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, APIResponse{
+		Success: true,
+		Message: "Te desinscribiste de la actividad",
 	})
 }
 
