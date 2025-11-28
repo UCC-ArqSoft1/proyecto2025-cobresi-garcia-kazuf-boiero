@@ -15,7 +15,7 @@ func Seed(db *gorm.DB) error {
 		return err
 	}
 	if userCount == 0 {
-		hashedPassword, err := security.HashPassword("changeme")
+		hashedPassword, err := security.HashPassword("contra123")
 		if err != nil {
 			return err
 		}

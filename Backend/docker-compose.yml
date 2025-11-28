@@ -45,9 +45,9 @@ services:
       DB_USER: ${DB_USER:-appuser}
       DB_PASSWORD: ${DB_PASSWORD:-apppass}
       DB_NAME: ${DB_NAME:-deportesdb}
-      JWT_SECRET: ${JWT_SECRET:-changeme}
+      JWT_SECRET: ${JWT_SECRET:-contra123}
     ports:
-      - "8080:8080"
+      - "8081:8080"
     restart: unless-stopped
     # Uncomment for live-reload during development (requires Air or similar inside the image).
     # volumes:
@@ -62,7 +62,7 @@ services:
       backend:
         condition: service_started
     environment:
-      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080/api}
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8081/api}
       CHOKIDAR_USEPOLLING: "true"
     ports:
       - "5173:5173"

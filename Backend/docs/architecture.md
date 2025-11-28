@@ -30,4 +30,4 @@
 ## Consideraciones adicionales
 - **CORS:** `middlewares/CORSMiddleware` habilita los métodos `GET, POST, PUT, DELETE, OPTIONS` y los headers `Content-Type, Authorization`. Hoy se permite cualquier `Origin` para simplificar el desarrollo; en producción se recomienda restringirlo.
 - **Seguridad:** Las contraseñas se almacenan con `bcrypt` (helpers en `security/password.go`) y los JWT se firman con HS256 usando `JWT_SECRET`. El middleware de autenticación vuelve a consultar el usuario para reconstruir el rol antes de permitir el acceso.
-- **Semillas:** Con `APP_ENV=dev` se crean usuarios de prueba (`admin@example.com`, `socia@example.com`, ambos con `changeme`) y actividades de ejemplo. Esto permite probar el flujo full-stack sin pasos manuales adicionales.
+- **Semillas:** Con `APP_ENV=dev` se crean usuarios de prueba (`admin@example.com`, `socia@example.com`, ambos con `contra123`) y actividades de ejemplo. Esto permite probar el flujo full-stack sin pasos manuales adicionales.

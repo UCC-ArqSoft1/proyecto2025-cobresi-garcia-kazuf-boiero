@@ -23,7 +23,7 @@ La API se expone bajo HTTP/JSON y es consumida por el frontend React (Vite) conf
 - **Descripción:** autentica usuarios (`socio` o `admin`) y devuelve un JWT.
 - **Body (JSON):**
   ```json
-  { "email": "admin@example.com", "password": "changeme" }
+  { "email": "admin@example.com", "password": "contra123" }
   ```
 - **Respuesta 200:**
   ```json
@@ -43,7 +43,7 @@ La API se expone bajo HTTP/JSON y es consumida por el frontend React (Vite) conf
 - **Descripción:** registra un nuevo socio (rol fijo `socio`). No devuelve token.
 - **Body:**
   ```json
-  { "name": "Socia Demo", "email": "socia@example.com", "password": "changeme" }
+  { "name": "Socia Demo", "email": "socia@example.com", "password": "contra123" }
   ```
 - **Respuesta 201:** `data` contiene el usuario creado.
 - **Errores:** `409 VALIDATION_ERROR` si el email ya existe.
