@@ -153,28 +153,114 @@ Campos expuestos: `id`, `user_id`, `activity_id`, `status`, `created_at`, `updat
 }
 ```
 
+## Admin Activities (solo rol admin)
+Todos requieren `Authorization: Bearer <token>` y los middlewares `Auth` + `Admin`.
+
+### /api/admin/activities (GET)
+- Descripcion: listado completo para administracion, permite filtrar por `q`, `category`, `day` y `is_active=true|false`.
+- Response 200:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "title": "Funcional",
+      "category": "fuerza",
+      "day_of_week": 2,
+      "start_time": "18:00",
+      "end_time": "19:00",
+      "capacity": 20,
+      "instructor": "Luca",
+      "is_active": true
+    }
+  ]
+}
+```
+
 ### /api/admin/activities (POST)
-- Descripcion: crea actividades. Solo admin.
+- Descripcion: crea una nueva actividad.
 - Body:
 ```json
 {
   "title": "Pilates",
-  "description": "",
+  "description": "Clases grupales",
   "category": "movilidad",
   "day_of_week": 4,
   "start_time": "09:00",
   "end_time": "10:00",
   "capacity": 12,
   "instructor": "Lola",
+  "image_url": "https://cdn.example/pilates.png",
   "is_active": true
 }
 ```
-- Response 201: actividad creada.
+- Response 201:
+```json
+{
+  "success": true,
+  "message": "Actividad creada",
+  "data": {
+    "id": 12,
+    "title": "Pilates",
+    "category": "movilidad",
+    "day_of_week": 4,
+    "start_time": "09:00",
+    "end_time": "10:00",
+    "capacity": 12,
+    "instructor": "Lola",
+    "is_active": true
+  }
+}
+```
+- Error 400 (validacion):
+```json
+{
+  "success": false,
+  "error": "capacity debe ser mayor a 0",
+  "code": "VALIDATION_ERROR"
+}
+```
 
 ### /api/admin/activities/:id (PUT)
-- Descripcion: actualiza una actividad existente. Solo admin.
-- Response 200: actividad actualizada.
+- Descripcion: actualiza completamente una actividad existente.
+- Body: mismo formato que `POST`.
+- Response 200:
+```json
+{
+  "success": true,
+  "message": "Actividad actualizada",
+  "data": {
+    "id": 12,
+    "title": "Pilates avanzado",
+    "description": "Nueva descripcion",
+    "category": "movilidad",
+    "day_of_week": 4,
+    "start_time": "09:30",
+    "end_time": "10:30",
+    "capacity": 15,
+    "instructor": "Lola",
+    "image_url": "https://cdn.example/pilates-2.png",
+    "is_active": true
+  }
+}
+```
+- Error 404:
+```json
+{
+  "success": false,
+  "error": "Actividad no encontrada",
+  "code": "NOT_FOUND"
+}
+```
 
 ### /api/admin/activities/:id (DELETE)
-- Descripcion: desactiva o elimina una actividad. Solo admin.
-- Response 204: sin cuerpo.
+- Descripcion: desactiva (soft-delete) una actividad (`is_active=false`).
+- Response 200:
+```json
+{
+  "success": true,
+  "message": "Actividad desactivada"
+}
+```
+- Error 404: `APIError` equivalente al de `PUT`.
