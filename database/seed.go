@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/alesio/gestion-actividades-deportivas/models"
+	"github.com/alesio/gestion-actividades-deportivas/security"
 	"gorm.io/gorm"
 )
 
@@ -14,9 +15,13 @@ func Seed(db *gorm.DB) error {
 		return err
 	}
 	if userCount == 0 {
+		hashedPassword, err := security.HashPassword("changeme")
+		if err != nil {
+			return err
+		}
 		users := []models.User{
-			{Name: "Admin", Email: "admin@example.com", PasswordHash: "changeme", Role: "admin"},
-			{Name: "Socia Demo", Email: "socia@example.com", PasswordHash: "changeme", Role: "socio"},
+			{Name: "Admin", Email: "admin@example.com", PasswordHash: hashedPassword, Role: "admin"},
+			{Name: "Socia Demo", Email: "socia@example.com", PasswordHash: hashedPassword, Role: "socio"},
 		}
 		if err := db.Create(&users).Error; err != nil {
 			return err

@@ -4,7 +4,7 @@
 
 ## Formatos base
 - `APIResponse`: `{ "success": true, "message": "opcional", "data": {} }`
-- `APIError`: `{ "success": false, "error": "descripcion legible", "code": "opcional" }`
+- `APIError`: `{ "success": false, "error": "descripcion legible", "code": "opcional", "details": "opcional" }`
 
 ## Modelos (contrato parcial)
 ### User (JSON)
@@ -17,11 +17,8 @@ Campos expuestos: `id`, `title`, `description`, `category`, `day_of_week` (0=dom
 Campos expuestos: `id`, `user_id`, `activity_id`, `status`, `created_at`, `updated_at`, y opcionalmente los objetos embebidos `user` o `activity` segun uso de `Preload`.
 
 ## Endpoints actuales
-### /api/health (GET)
-- Descripcion: verifica que la API esta viva.
-- Response 200: `{ "status": "ok" }`.
-
-### /api/auth/login (POST)
+### Auth
+#### /api/auth/login (POST)
 - Descripcion: inicio de sesion de socios o administradores.
 - Body:
 ```json
@@ -30,15 +27,59 @@ Campos expuestos: `id`, `user_id`, `activity_id`, `status`, `created_at`, `updat
 - Response 200:
 ```json
 {
-  "token": "jwt-token",
-  "user": {
-    "id": 1,
+  "success": true,
+  "message": "Login exitoso",
+  "data": {
+    "token": "jwt-token",
+    "user": {
+      "id": 1,
+      "name": "Ale",
+      "email": "ale@example.com",
+      "role": "socio"
+    }
+  }
+}
+```
+- Error 401 (credenciales invalidas):
+```json
+{
+  "success": false,
+  "error": "Credenciales inválidas",
+  "code": "UNAUTHORIZED"
+}
+```
+
+#### /api/auth/register (POST)
+- Descripcion: crea un nuevo usuario con rol `socio`.
+- Body:
+```json
+{ "name": "Ale", "email": "ale@dominio.com", "password": "123456" }
+```
+- Response 201:
+```json
+{
+  "success": true,
+  "message": "Registro exitoso",
+  "data": {
+    "id": 10,
     "name": "Ale",
-    "email": "ale@example.com",
+    "email": "ale@dominio.com",
     "role": "socio"
   }
 }
 ```
+- Error 409 (email duplicado):
+```json
+{
+  "success": false,
+  "error": "El email ya está registrado",
+  "code": "VALIDATION_ERROR"
+}
+```
+
+### /api/health (GET)
+- Descripcion: verifica que la API esta viva.
+- Response 200: `{ "status": "ok" }`.
 
 ### /api/activities (GET)
 - Descripcion: lista actividades publicas con filtros opcionales `q`, `category`, `day`.

@@ -12,4 +12,5 @@ type APIError struct {
 	Success bool   `json:"success"`
 	Error   string `json:"error"`
 	Code    string `json:"code,omitempty"`
+	Details string `json:"details,omitempty"`
 }
