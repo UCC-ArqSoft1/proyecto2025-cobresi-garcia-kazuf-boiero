@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Actividad sin imagen">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f1a2f"/>
+      <stop offset="100%" stop-color="#1f355d"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#gradient)" rx="24" ry="24"/>
+  <path d="M120 210 L180 150 L230 195 L270 165 L320 210 Z" fill="rgba(248,198,61,0.5)"/>
+  <circle cx="150" cy="120" r="40" fill="none" stroke="#f8c63d" stroke-width="4"/>
+  <path d="M150 105 Q170 120 150 135 Q130 120 150 105 Z" fill="#f8c63d"/>
+  <text x="200" y="250" font-family="Arial, sans-serif" font-size="28" text-anchor="middle" fill="#ffffff" opacity="0.85">
+    Actividad
+  </text>
+</svg>
